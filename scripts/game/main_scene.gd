@@ -126,11 +126,22 @@ func create_main_menu() -> void:
 
 func show_settings(from: String) -> void:
 	previous_menu = from
-	clear_scene()
-	active_menu = "settings"
 	
-	var settings = Control.new()
-	add_child(settings)
+	var settings_layer: CanvasLayer = null
+	var settings: Control
+	
+	if from == "game":
+		settings_layer = CanvasLayer.new()
+		settings_layer.layer = 10
+		add_child(settings_layer)
+		settings = Control.new()
+		settings_layer.add_child(settings)
+		active_menu = "game"
+	else:
+		clear_scene()
+		settings = Control.new()
+		add_child(settings)
+		active_menu = "settings"
 	
 	var title = Label.new()
 	title.text = tr("settings")
@@ -214,7 +225,10 @@ func show_settings(from: String) -> void:
 	var back_y = start_y + items.size() * 60 + 30
 	var back = make_button(tr("back"), func():
 		if previous_menu == "game":
-			start_game()
+			if settings_layer:
+				input_enabled = true
+				remove_child(settings_layer)
+				settings_layer.queue_free()
 		else:
 			create_main_menu()
 	, Color(0.2, 0.2, 0.25))
